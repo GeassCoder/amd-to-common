@@ -9,9 +9,9 @@ var _ = require('underscore');
  */
 var makeRequireStatement = function(name, identifier){
   if(name){
-    return 'var ' + name + ' = require(\'' + identifier + '\');';
+    return `var ${name} = require("${identifier}");`;
   }
-  return 'require(\'' + identifier + '\');';
+  return `require("${identifier}");`;
 };
 
 /**
@@ -25,7 +25,7 @@ var addImportStatements = function(content, amdNode){
   var functionNode = amdNode.getFunctionNode();
   var functionBlockStart = functionNode.body.range[0] + 1;
   var requireStatements = _.reduce(amdNode.getDependencyMap(), function(memo, name, identifier){
-    memo = memo + '\n  ' + makeRequireStatement(name, identifier);
+    memo = memo + '\n\t' + makeRequireStatement(name, identifier);
     return memo;
   }, '');
 
@@ -47,10 +47,10 @@ var addRequireStatement = function(content, amdNode){
   var argumentsStart = amdNode.getArrayNode().range[0];
   var functionNode = amdNode.getFunctionNode();
   var functionBlockStart = functionNode.body.range[0];
-  var defineStart = amdNode.node.range[0];
+  var functionName = functionNode.id && functionNode.id.name || "";
 
-  var defineString = content.substring(defineStart, argumentsStart);
-  var newDefine = 'function(require, exports, module)';
+  var defineString = "define(";
+  var newDefine = `function ${functionName} (require, exports, module) `;
 
   var blockContent = content.substring(functionBlockStart, content.length);
   return defineString + newDefine + blockContent;

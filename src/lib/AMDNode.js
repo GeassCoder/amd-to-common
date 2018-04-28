@@ -10,19 +10,22 @@ var AMDNode = function(node){
 };
 
 /**
- * Determine whether a node represents a requireJS 'define' call.
+ * Determine whether a node represents a requireJS "define" call or an AMD "require" call.
  * @param {Object} node AST node
  * @returns {Boolean} true if define call, false otherwise
  */
-AMDNode.prototype.isDefine = function(){
+AMDNode.prototype.isDefineOrAMDRequire = function(){
   var node = this.node;
-  if(!node || !node.type || node.type !== 'ExpressionStatement'){
+  if(!node || !node.type || node.type !== "ExpressionStatement"){
     return false;
   }
-  if(node.expression.type !== 'CallExpression'){
+
+  if(node.expression.type !== "CallExpression"){
     return false;
   }
-  return Boolean(node.expression.callee.name === 'define');
+
+  return (node.expression.callee.name === "define") ||
+    (node.expression.arguments[1] && node.expression.arguments[1].type === "FunctionExpression");
 };
 
 /**
@@ -35,7 +38,7 @@ AMDNode.prototype.isDefine = function(){
  * @returns {boolean} true if AMD style, false otherwise
  */
 AMDNode.prototype.isAMDStyle = function(){
-  if(!this.isDefine()){
+  if(!this.isDefineOrAMDRequire()){
     return false;
   }
   var defineArguments = this.node.expression.arguments;

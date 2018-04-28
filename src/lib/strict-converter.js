@@ -17,7 +17,7 @@ module.exports = function convert(content, node){
   }
 
   // Otherwise, let's rip it out and make it the first node.
-  var strictRegex = /["']use strict['"];?\n/;
+  var strictRegex = /\s*["']use strict['"];/;
   var lenientContent = content.replace(strictRegex, '');
 
   // Let's save some trouble and assume this is a valid common style node for now.
@@ -26,7 +26,7 @@ module.exports = function convert(content, node){
   var toStrict = lenientContent.substring(0, firstNode.range[0]);
   var afterStrict = lenientContent.substring(firstNode.range[0], content.length);
 
-  return toStrict + '\'use strict\';\n  ' + afterStrict;
+  return toStrict + `"use strict";\n\n\t` + afterStrict;
 };
 
 function isUseStrict(node){
